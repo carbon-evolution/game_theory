@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from tabulate import tabulate
 
 def simulate_strategies(n_rounds=100):
     # Initialize strategies
@@ -38,31 +39,77 @@ def simulate_strategies(n_rounds=100):
     
     return strategies
 
-def plot_strategies():
-    results = simulate_strategies(100)
+def simulate_and_analyze_strategies(n_rounds=100):
+    results = simulate_strategies(n_rounds)
     
-    plt.figure(figsize=(15, 8))
-    
-    # Strategy colors and descriptions
-    strategies = {
-        'Always Cooperate': {'color': 'green', 'desc': '→ Steady growth but vulnerable to exploitation'},
-        'Always Defect': {'color': 'red', 'desc': '→ High initial gains but poor long-term outcome'},
-        'Tit for Tat': {'color': 'blue', 'desc': '→ Balanced approach: adapts to opponent\'s moves'},
-        'Random': {'color': 'purple', 'desc': '→ Unpredictable performance, serves as baseline'}
+    # Calculate statistics for each strategy
+    analysis = {
+        'Strategy': [],
+        'Final Score': [],
+        'Avg Growth': [],
+        'Volatility': [],
+        'Behavior Pattern': []
     }
     
-    # Plot each strategy with inline description
-    for strategy, data in results.items():
-        plt.plot(data, label=f"{strategy} {strategies[strategy]['desc']}", 
-                color=strategies[strategy]['color'], linewidth=2)
+    behavior_desc = {
+        'Always Cooperate': 'Consistent cooperation, vulnerable to exploitation',
+        'Always Defect': 'Aggressive strategy, high initial gains',
+        'Tit for Tat': 'Adaptive strategy, balanced performance',
+        'Random': 'Unpredictable, baseline reference'
+    }
     
-    plt.title("Game Theory Strategies: Behavior Analysis", fontsize=14, pad=20)
-    plt.xlabel("Rounds", fontsize=12)
-    plt.ylabel("Cumulative Score", fontsize=12)
+    for strategy, scores in results.items():
+        analysis['Strategy'].append(strategy)
+        analysis['Final Score'].append(round(scores[-1], 2))
+        analysis['Avg Growth'].append(round(np.mean(np.diff(scores)), 2))
+        analysis['Volatility'].append(round(np.std(np.diff(scores)), 2))
+        analysis['Behavior Pattern'].append(behavior_desc[strategy])
+    
+    return results, analysis
+
+def plot_with_table():
+    results, analysis = simulate_and_analyze_strategies(100)
+    
+    # Create figure with subplots
+    fig = plt.figure(figsize=(15, 10))
+    
+    # Plot strategies
+    plt.subplot(2, 1, 1)
+    colors = {
+        'Always Cooperate': 'green',
+        'Always Defect': 'red',
+        'Tit for Tat': 'blue',
+        'Random': 'purple'
+    }
+    
+    for strategy, scores in results.items():
+        plt.plot(scores, label=strategy, color=colors[strategy], linewidth=2)
+    
+    plt.title("Game Theory Strategy Comparison", fontsize=14)
+    plt.xlabel("Rounds")
+    plt.ylabel("Score")
     plt.grid(True, linestyle='--', alpha=0.3)
-    plt.legend(bbox_to_anchor=(1.04, 1), loc='upper left', fontsize=10)
+    plt.legend()
+    
+    # Create table
+    table_data = list(zip(
+        analysis['Strategy'],
+        analysis['Final Score'],
+        analysis['Avg Growth'],
+        analysis['Volatility'],
+        analysis['Behavior Pattern']
+    ))
+    
+    # Print table using tabulate
+    print("\nStrategy Analysis:")
+    print(tabulate(table_data, 
+                  headers=['Strategy', 'Final Score', 'Avg Growth/Round', 'Volatility', 'Behavior Pattern'],
+                  tablefmt='grid',
+                  numalign='right',
+                  stralign='left'))
+    
     plt.tight_layout()
     plt.show()
 
 if __name__ == "__main__":
-    plot_strategies()
+    plot_with_table()
