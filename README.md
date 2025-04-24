@@ -38,6 +38,8 @@ The repository includes `strategies_data.csv` which contains historical strategy
 
 ## Screenshots
 
+![image](https://github.com/user-attachments/assets/749bbab1-f618-4291-90ea-bf1a38d1edda)
+
 ![image](https://github.com/user-attachments/assets/c678ccf3-27f5-4969-9684-6eb3ae05bded)
 
 ## License
